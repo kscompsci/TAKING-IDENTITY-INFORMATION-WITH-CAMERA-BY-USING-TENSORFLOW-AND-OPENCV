@@ -1,245 +1,144 @@
+# TAKING-IDENTITY-INFORMATION-WITH-CAMERA-BY-USING-TENSORFLOW-AND-OPENCV
+Hi everybody!
 
-# Tensorflow Object Detection API
-Creating accurate machine learning models capable of localizing and identifying
-multiple objects in a single image remains a core challenge in computer vision.
-The TensorFlow Object Detection API is an open source framework built on top of
-TensorFlow that makes it easy to construct, train and deploy object detection
-models.  At Google we’ve certainly found this codebase to be useful for our
-computer vision needs, and we hope that you will as well.
-<p align="center">
-  <img src="g3doc/img/kites_detections_output.jpg" width=676 height=450>
-</p>
-Contributions to the codebase are welcome and we would love to hear back from
-you if you find this API useful.  Finally if you use the Tensorflow Object
-Detection API for a research publication, please consider citing:
+Me and my buddy @krsad decided to develop a project about taking identity information from ID cards.
+
+We used Tensorflow and OpenCV for detecting ID cards. Also we used Tesseract OCR for detecting and taking the texts on the cards.
+
+We coded in python and run it on Ubuntu.
+
+Generally, we runned our program in real time. So we arranged the codes to run with a smartphone. We did this, because a camera of smartphone is better than a webcam. However, it is possible to study on a photograph or on a video. Also those files could be find in this tutorial.
+
+We still working on this project and keep developing it.
+
+<h2>Installation</h2> 
+
+Running Tesseract on Windows is not easy, so we used Ubuntu as operating system.
+
+We trained our model for detecting 3 ID cards which are Rebuplic of Turkey Identity Card, Driving Licence and University of Ankara Identity Card. You can directly use our trained model or you can train your own model. So, you have 2 options:
+
+1- You can train your own model and you can use it on your own project. It has already been shown in <a href=https://github.com/EdjeElectronics/TensorFlow-Object-Detection-API-Tutorial-Train-Multiple-Objects-Windows-10>here</a>. Or,
+
+2- You can use the model that we trained for this project (to be able to run this project on your computer). This is going to be shown in this tutorial.
+
+Install Python3 (we used 3.6) and PyCharm could be used as IDE.
+
+Note: If you currently use Tensorflow for your some another projects, setting up a virtual environment and using it for this project would be better for you to prevent probable problems. We recommend Anaconda Virtual Environment.
+
+For Tensorflow, we have 2 options; Tensorflow CPU and Tensorflow GPU. If you have GPU Driver, we highly recommend you to use Tensorflow GPU.
+
+<h2>Tensorflow</h2>
+<h3>1. Tensorflow CPU</h3>
+
+Open command line and write down this code:
+```ruby
+C:\> pip install --upgrade tensorflow
+```
+That's all for CPU. You can test it by opening python terminal in the command line. Write down "python". Now, write the codes below:
+```ruby
+>>> import tensorflow as tf
+>>> hello = tf.constant('Hello, TensorFlow!')
+>>> sess = tf.Session()
+>>> print(sess.run(hello))
+```
+If you take "Hello, Tensorflow!" as output, it means that everything is OK.
+
+<h3>2. Tensorflow GPU</h3>
+
+Firstly, CUDA and CUDNN which are libraries of NVidia, have to be installed. Also don't forget to update your GPU driver to latest version.
+
+Download CUDA version 10.0 from its website and install it. After installation, new paths have to be added in "environment variables" in your computer just as below. However, if you installed CUDA in an another directory, make necessary changes on the paths below.
 
 ```
-"Speed/accuracy trade-offs for modern convolutional object detectors."
-Huang J, Rathod V, Sun C, Zhu M, Korattikara A, Fathi A, Fischer I, Wojna Z,
-Song Y, Guadarrama S, Murphy K, CVPR 2017
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\bin
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\libnvvp
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\extras\CUPTI\libx64
 ```
-\[[link](https://arxiv.org/abs/1611.10012)\]\[[bibtex](
-https://scholar.googleusercontent.com/scholar.bib?q=info:l291WsrB-hQJ:scholar.google.com/&output=citation&scisig=AAGBfm0AAAAAWUIIlnPZ_L9jxvPwcC49kDlELtaeIyU-&scisf=4&ct=citation&cd=-1&hl=en&scfhb=1)\]
 
-<p align="center">
-  <img src="g3doc/img/tf-od-api-logo.png" width=140 height=195>
-</p>
+Download CuDNN 7.4.2 for CUDA 10.0 from its website. Open "bin" file from downloaded file and copy cudnn64_7.dll. Paste it into the "bin" file of CUDA. Default directory would be like this:
 
-## Maintainers
+```
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\bin
+```
+Now, open command line and run this code:
 
-* Jonathan Huang, github: [jch1](https://github.com/jch1)
-* Vivek Rathod, github: [tombstone](https://github.com/tombstone)
-* Ronny Votel, github: [ronnyvotel](https://github.com/ronnyvotel)
-* Derek Chow, github: [derekjchow](https://github.com/derekjchow)
-* Chen Sun, github: [jesu9](https://github.com/jesu9)
-* Menglong Zhu, github: [dreamdragon](https://github.com/dreamdragon)
-* Alireza Fathi, github: [afathi3](https://github.com/afathi3)
-* Zhichao Lu, github: [pkulzc](https://github.com/pkulzc)
+```ruby
+C:\> pip install --upgrade tensorflow-gpu
+```
 
+You can test it as we did for Tensorflow CPU.
 
-## Table of contents
+Also run the codes below in command line for installing other necessary libraries.
 
-Setup:
+```ruby
+C:\> pip install --ignore-installed --upgrade tensorflow-gpu
+C:\> conda install -c anaconda protobuf
+C:\> pip install pillow
+C:\> pip install lxml
+C:\> pip install jupyter
+C:\> pip install matplotlib
+C:\> pip install pandas
+C:\> pip install opencv-python
+```
+Note: If you installed the Tensorflow for the CPU, delete the "-gpu" from the first line.
 
-  * <a href='g3doc/installation.md'>Installation</a><br>
+<h2>Object Detection</h2>
 
-Quick Start:
+Firstly, download Tensorflow Object Detection API from <a href=https://github.com/tensorflow/models>here</a>.
 
-  * <a href='object_detection_tutorial.ipynb'>
-      Quick Start: Jupyter notebook for off-the-shelf inference</a><br>
-  * <a href="g3doc/running_pets.md">Quick Start: Training a pet detector</a><br>
+Then, download files of this project.
 
-Customizing a Pipeline:
+Paste it into the models-master/research and approve the changes.
 
-  * <a href='g3doc/configuring_jobs.md'>
-      Configuring an object detection pipeline</a><br>
-  * <a href='g3doc/preparing_inputs.md'>Preparing inputs</a><br>
+You can now identify 3 ID cards in webcam. But, it won't work yet, because connection to smartphone have to be done. In addition, Tesseract have to be installed.
 
-Running:
+<h2>Smartphone Connection and Tesseract OCR</h2>
 
-  * <a href='g3doc/running_locally.md'>Running locally</a><br>
-  * <a href='g3doc/running_on_cloud.md'>Running on the cloud</a><br>
+We used an Android app but finding an iOS app is possible at the App Store. You can find it in <a href="https://play.google.com/store/apps/details?id=com.pas.webcam&hl">here</a>, install it on your smartphone. For connect your smartphone to computer, start the app. Click on "Start Server". Now, you can see the IP address and the port number. Open the "object-detection-tutorial-webcam.py" file in object_detection file. Write down the IP address and the port number into the code. You can easily find the line where they must be written.
 
-Extras:
+Lastly, Tesseract have to be installed for text detection. Download it in <a href=https://github.com/tesseract-ocr/tesseract>here</a> and install it by following the instructions.
 
-  * <a href='g3doc/detection_model_zoo.md'>Tensorflow detection model zoo</a><br>
-  * <a href='g3doc/exporting_models.md'>
-      Exporting a trained model for inference</a><br>
-  * <a href='g3doc/defining_your_own_model.md'>
-      Defining your own model architecture</a><br>
-  * <a href='g3doc/using_your_own_dataset.md'>
-      Bringing in your own dataset</a><br>
-  * <a href='g3doc/evaluation_protocols.md'>
-      Supported object detection evaluation protocols</a><br>
-  * <a href='g3doc/oid_inference_and_evaluation.md'>
-      Inference and evaluation on the Open Images dataset</a><br>
-  * <a href='g3doc/instance_segmentation.md'>
-      Run an instance segmentation model</a><br>
-  * <a href='g3doc/challenge_evaluation.md'>
-      Run the evaluation for the Open Images Challenge 2018</a><br>
-  * <a href='g3doc/tpu_compatibility.md'>
-      TPU compatible detection pipelines</a><br>
-  * <a href='g3doc/running_on_mobile_tensorflowlite.md'>
-      Running object detection on mobile devices with TensorFlow Lite</a><br>
+Installation is done.
 
-## Getting Help
+<h2>Using the Programme</h2>
 
-To get help with issues you may encounter using the Tensorflow Object Detection
-API, create a new question on [StackOverflow](https://stackoverflow.com/) with
-the tags "tensorflow" and "object-detection".
+Start the server on your smartphone.
 
-Please report bugs (actually broken code, not usage questions) to the
-tensorflow/models GitHub
-[issue tracker](https://github.com/tensorflow/models/issues), prefixing the
-issue name with "object_detection".
+Run "object-detection-tutorial-webcam.py". View of camera of smartphone will be displayed on the computer screen.
 
-Please check [FAQ](g3doc/faq.md) for frequently asked questions before
-reporting an issue.
+Focus on any of the 3 cards (Rebuplic of Turkey Identity Card, Driving Licence and University of Ankara Identity Card) and take a photo by pushing on the "Q" on keyboard when the camera is well-focused.
 
+You can see the detected texts (ID Number and names) as the output of the code.
 
-## Release information
+Also, you will see the stages on the screen which have been runned after taking the photo.
 
-### Sep 17, 2018
+If you train your own model, you can easily arrange all of these codes for your own project.
 
-We have released Faster R-CNN detectors with ResNet-50 / ResNet-101 feature
-extractors trained on the [iNaturalist Species Detection Dataset](https://github.com/visipedia/inat_comp/blob/master/2017/README.md#bounding-boxes).
-The models are trained on the training split of the iNaturalist data for 4M
-iterations, they achieve 55% and 58% mean AP@.5 over 2854 classes respectively.
-For more details please refer to this [paper](https://arxiv.org/abs/1707.06642).
+<h2>Consequences</h2>
 
-<b>Thanks to contributors</b>: Chen Sun
+Here, you can see the examples from steps of the programme.
 
-### July 13, 2018
+1- Detected object(driving licence) can be seen in the photo below:
 
-There are many new updates in this release, extending the functionality and
-capability of the API:
+<img src="https://github.com/kscompsci/TAKING-IDENTITY-INFORMATION-WITH-CAMERA-BY-USING-TENSORFLOW-AND-OPENCV/blob/master/WhatsApp%20Image%202019-04-11%20at%2016.53.16%20(2).jpeg" alt="Photo Detection">
 
-* Moving from slim-based training to [Estimator](https://www.tensorflow.org/api_docs/python/tf/estimator/Estimator)-based
-training.
-* Support for [RetinaNet](https://arxiv.org/abs/1708.02002), and a [MobileNet](https://ai.googleblog.com/2017/06/mobilenets-open-source-models-for.html)
-adaptation of RetinaNet.
-* A novel SSD-based architecture called the [Pooling Pyramid Network](https://arxiv.org/abs/1807.03284) (PPN).
-* Releasing several [TPU](https://cloud.google.com/tpu/)-compatible models.
-These can be found in the `samples/configs/` directory with a comment in the
-pipeline configuration files indicating TPU compatibility.
-* Support for quantized training.
-* Updated documentation for new binaries, Cloud training, and [Tensorflow Lite](https://www.tensorflow.org/mobile/tflite/).
+2- You can see the cropped object below:
 
-See also our [expanded announcement blogpost](https://ai.googleblog.com/2018/07/accelerated-training-and-inference-with.html) and accompanying tutorial at the [TensorFlow blog](https://medium.com/tensorflow/training-and-serving-a-realtime-mobile-object-detector-in-30-minutes-with-cloud-tpus-b78971cf1193).
+<img src="https://github.com/kscompsci/TAKING-IDENTITY-INFORMATION-WITH-CAMERA-BY-USING-TENSORFLOW-AND-OPENCV/blob/master/WhatsApp%20Image%202019-04-11%20at%2016.53.16%20(1).jpeg" alt="Photo Clip">
 
-<b>Thanks to contributors</b>: Sara Robinson, Aakanksha Chowdhery, Derek Chow,
-Pengchong Jin, Jonathan Huang, Vivek Rathod, Zhichao Lu, Ronny Votel
+3- Here you can see 3 (perspective transformation, denoising and contrast) stages:
 
+<img src="https://github.com/kscompsci/TAKING-IDENTITY-INFORMATION-WITH-CAMERA-BY-USING-TENSORFLOW-AND-OPENCV/blob/master/WhatsApp%20Image%202019-04-11%20at%2016.53.16.jpeg" alt="Stages of Programme">
 
-### June 25, 2018
+4- Finally, taken ID Number(TC Kimlik Numarası) and name can be seen below:
 
-Additional evaluation tools for the [Open Images Challenge 2018](https://storage.googleapis.com/openimages/web/challenge.html) are out.
-Check out our short tutorial on data preparation and running evaluation [here](g3doc/challenge_evaluation.md)!
+<img src="https://github.com/kscompsci/TAKING-IDENTITY-INFORMATION-WITH-CAMERA-BY-USING-TENSORFLOW-AND-OPENCV/blob/master/WhatsApp%20Image%202019-04-11%20at%2016.53.15.jpeg" alt="Stages of Programme">
 
-<b>Thanks to contributors</b>: Alina Kuznetsova
+<h2>For Errors and Help</h2>
 
-### June 5, 2018
+Installing Tensorflow won't be so easy. We highly recommend you to check <a href="https://www.tensorflow.org">tensorflow.org</a> for solving problems which will occur during the installation and more information about Tensorflow can be found there.
 
-We have released the implementation of evaluation metrics for both tracks of the [Open Images Challenge 2018](https://storage.googleapis.com/openimages/web/challenge.html) as a part of the Object Detection API - see the [evaluation protocols](g3doc/evaluation_protocols.md) for more details.
-Additionally, we have released a tool for hierarchical labels expansion for the Open Images Challenge: check out [oid_hierarchical_labels_expansion.py](dataset_tools/oid_hierarchical_labels_expansion.py).
 
-<b>Thanks to contributors</b>: Alina Kuznetsova, Vittorio Ferrari, Jasper Uijlings
+5- This term all the codes have been updated because of the development on client. You can easily reach the android application on our github. There is a server side of the project also. We will add that later. https://github.com/kscompsci/id-reader-android-app => here is the link on the application. We are waiting your support to develop the project:)
 
-### April 30, 2018
-
-We have released a Faster R-CNN detector with ResNet-101 feature extractor trained on [AVA](https://research.google.com/ava/) v2.1.
-Compared with other commonly used object detectors, it changes the action classification loss function to per-class Sigmoid loss to handle boxes with multiple labels.
-The model is trained on the training split of AVA v2.1 for 1.5M iterations, it achieves mean AP of 11.25% over 60 classes on the validation split of AVA v2.1.
-For more details please refer to this [paper](https://arxiv.org/abs/1705.08421).
-
-<b>Thanks to contributors</b>: Chen Sun, David Ross
-
-### April 2, 2018
-
-Supercharge your mobile phones with the next generation mobile object detector!
-We are adding support for MobileNet V2 with SSDLite presented in
-[MobileNetV2: Inverted Residuals and Linear Bottlenecks](https://arxiv.org/abs/1801.04381).
-This model is 35% faster than Mobilenet V1 SSD on a Google Pixel phone CPU (200ms vs. 270ms) at the same accuracy.
-Along with the model definition, we are also releasing a model checkpoint trained on the COCO dataset.
-
-<b>Thanks to contributors</b>: Menglong Zhu, Mark Sandler, Zhichao Lu, Vivek Rathod, Jonathan Huang
-
-### February 9, 2018
-
-We now support instance segmentation!!  In this API update we support a number of instance segmentation models similar to those discussed in the [Mask R-CNN paper](https://arxiv.org/abs/1703.06870). For further details refer to
-[our slides](http://presentations.cocodataset.org/Places17-GMRI.pdf) from the 2017 Coco + Places Workshop.
-Refer to the section on [Running an Instance Segmentation Model](g3doc/instance_segmentation.md) for instructions on how to configure a model
-that predicts masks in addition to object bounding boxes.
-
-<b>Thanks to contributors</b>: Alireza Fathi, Zhichao Lu, Vivek Rathod, Ronny Votel, Jonathan Huang
-
-### November 17, 2017
-
-As a part of the Open Images V3 release we have released:
-
-* An implementation of the Open Images evaluation metric and the [protocol](g3doc/evaluation_protocols.md#open-images).
-* Additional tools to separate inference of detection and evaluation (see [this tutorial](g3doc/oid_inference_and_evaluation.md)).
-* A new detection model trained on the Open Images V2 data release (see [Open Images model](g3doc/detection_model_zoo.md#open-images-models)).
-
-See more information on the [Open Images website](https://github.com/openimages/dataset)!
-
-<b>Thanks to contributors</b>: Stefan Popov, Alina Kuznetsova
-
-### November 6, 2017
-
-We have re-released faster versions of our (pre-trained) models in the
-<a href='g3doc/detection_model_zoo.md'>model zoo</a>.  In addition to what
-was available before, we are also adding Faster R-CNN models trained on COCO
-with Inception V2 and Resnet-50 feature extractors, as well as a Faster R-CNN
-with Resnet-101 model trained on the KITTI dataset.
-
-<b>Thanks to contributors</b>: Jonathan Huang, Vivek Rathod, Derek Chow,
-Tal Remez, Chen Sun.
-
-### October 31, 2017
-
-We have released a new state-of-the-art model for object detection using
-the Faster-RCNN with the
-[NASNet-A image featurization](https://arxiv.org/abs/1707.07012). This
-model achieves mAP of 43.1% on the test-dev validation dataset for COCO,
-improving on the best available model in the zoo by 6% in terms
-of absolute mAP.
-
-<b>Thanks to contributors</b>: Barret Zoph, Vijay Vasudevan, Jonathon Shlens, Quoc Le
-
-### August 11, 2017
-
-We have released an update to the [Android Detect
-demo](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android)
-which will now run models trained using the Tensorflow Object
-Detection API on an Android device.  By default, it currently runs a
-frozen SSD w/Mobilenet detector trained on COCO, but we encourage
-you to try out other detection models!
-
-<b>Thanks to contributors</b>: Jonathan Huang, Andrew Harp
-
-
-### June 15, 2017
-
-In addition to our base Tensorflow detection model definitions, this
-release includes:
-
-* A selection of trainable detection models, including:
-  * Single Shot Multibox Detector (SSD) with MobileNet,
-  * SSD with Inception V2,
-  * Region-Based Fully Convolutional Networks (R-FCN) with Resnet 101,
-  * Faster RCNN with Resnet 101,
-  * Faster RCNN with Inception Resnet v2
-* Frozen weights (trained on the COCO dataset) for each of the above models to
-  be used for out-of-the-box inference purposes.
-* A [Jupyter notebook](object_detection_tutorial.ipynb) for performing
-  out-of-the-box inference with one of our released models
-* Convenient [local training](g3doc/running_locally.md) scripts as well as
-  distributed training and evaluation pipelines via
-  [Google Cloud](g3doc/running_on_cloud.md).
-
-
-<b>Thanks to contributors</b>: Jonathan Huang, Vivek Rathod, Derek Chow,
-Chen Sun, Menglong Zhu, Matthew Tang, Anoop Korattikara, Alireza Fathi, Ian Fischer, Zbigniew Wojna, Yang Song, Sergio Guadarrama, Jasper Uijlings,
-Viacheslav Kovalevskyi, Kevin Murphy
-
+One of the useful website is, of course, <a href="https://opencv.org">opencv.org</a>. Check it!
